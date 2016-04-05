@@ -3004,6 +3004,22 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
         }
     }
 
+    // Coinbase transaction must include founders' reward if the
+    // block height is below 210000, which is the first halvening.
+    // The genesis block is excused from this requirement.
+    if ((nHeight > 0) && (nHeight < FOUNDERS_REWARD_UNTIL_BLOCK)) {
+        if (block.vtx[0].vout.size() != 0) {
+            if (block.vtx[0].vout[0].scriptPubKey != ParseHex(FOUNDERS_REWARD_SCRIPT)) {
+                return state.DoS(100, error("%s: invalid founders reward P2SH", __func__), REJECT_INVALID, "cb-no-founders-reward");
+            }
+            if (block.vtx[0].vout[0].nValue != (FOUNDERS_REWARD_AMOUNT_PER_BLOCK * COIN)) {
+                return state.DoS(100, error("%s: invalid founders reward value", __func__), REJECT_INVALID, "cb-no-founders-reward");
+            }
+        } else {
+            return state.DoS(100, error("%s: founders reward was omitted", __func__), REJECT_INVALID, "cb-no-founders-reward");
+        }
+    }
+
     return true;
 }
 
