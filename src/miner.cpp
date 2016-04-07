@@ -327,7 +327,10 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
         txNew.vin[0].prevout.SetNull();
         txNew.vin[0].scriptSig = CScript() << nHeight << OP_0;
 
-        if (nHeight < FOUNDERS_REWARD_UNTIL_BLOCK) {
+        // We shouldn't ever use this function to generate the
+        // genesis block, but for consistency with the consensus
+        // rule we will check nHeight > 0.
+        if ((nHeight > 0) && (nHeight < FOUNDERS_REWARD_UNTIL_BLOCK)) {
             txNew.vout.resize(2);
 
             auto rewardScript = ParseHex(FOUNDERS_REWARD_SCRIPT);
