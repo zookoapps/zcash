@@ -3004,9 +3004,9 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
         }
     }
 
-    // Coinbase transaction must include founders' reward if the
-    // block height is below 210000, which is the first halvening.
-    // The genesis block is excused from this requirement.
+    // Coinbase transaction must include founders' reward for the
+    // first four years. The genesis block is excused from this
+    // requirement.
     if ((nHeight > 0) && (nHeight < FOUNDERS_REWARD_UNTIL_BLOCK)) {
         if (block.vtx[0].vout.size() != 0) {
             if (block.vtx[0].vout[0].scriptPubKey != ParseHex(FOUNDERS_REWARD_SCRIPT)) {
